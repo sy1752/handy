@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, initial-scale=0.8, minimum-scale=0.8, maximum-scale=1.0"> <!-- ビューポート倍率の設定 -->
+    <title>Handy！何でも依頼しよう！</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            background-image: url('cloud-background.png');
+            background-size: cover;
+            background-attachment: fixed;
+            border: 5px solid #66ccff; /* 画面全体を水色の枠で囲む */
+            zoom: 0.9; /* 画面全体のズーム倍率を調整 */
+        }
+
+        header {
+            background-color: #66ccff;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 100;
+        }
+
+        .main {
+            float: left;
+            width: 70%;
+            color: #333;
+        }
+
+        .sidebar {
+            float: left;
+            width: 30%;
+            background: #f4f4f4;
+            padding: 10px;
+        }
+
+        .message-board {
+            width: 100%;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            padding: 0;
+            max-height: calc(60vh - 120px); /* スクロールエリアの縦幅を縮小 */
+            overflow-y: auto;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .message-board-lower {
+            padding: 10px;
+        }
+
+        .message-item {
+            background-color: #f2f2f2;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            position: relative;
+            display: flex;
+            flex-direction: column; /* 内容が重ならないように列方向に配置 */
+            align-items: flex-start;
+            word-wrap: break-word; /* メッセージ内容が途切れずに表示されるように折り返し表示 */
+        }
+
+            .message-item img {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                margin-bottom: 10px;
+                cursor: pointer; /* アイコンをクリックできるように設定 */
+            }
+
+        .message-item-content {
+            font-weight: bold;
+            margin-bottom: 5px;
+            flex-grow: 1;
+        }
+
+        .message-item-amount,
+        .message-item-gender {
+            margin-bottom: 5px;
+        }
+
+        .accept-button {
+            padding: 5px 10px;
+            background-color: #66ccff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            align-self: flex-end; /* ボタンが重ならないように右端に配置 */
+        }
+
+        .filter-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1500;
+        }
+
+            .filter-container select {
+                padding: 5px;
+                border: 1px solid #ccc;
+            }
+
+        .message-input-container {
+            position: relative; /* スクロールエリア直下に配置 */
+            width: 100%; /* 横幅を変更 */
+            text-align: center;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000; /* メッセージ入力枠を前面に配置 */
+            margin-bottom: 20px; /* フッターとの間に余白を追加 */
+        }
+
+            .message-input-container .left-column,
+            .message-input-container .right-column {
+                display: inline-block;
+                vertical-align: top;
+                width: 48%; /* 左右均等に配置 */
+            }
+
+            .message-input-container input[type="text"],
+            .message-input-container input[type="number"],
+            .message-input-container select {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                margin-bottom: 10px;
+                resize: none;
+                word-wrap: break-word; /* メッセージ入力欄も折り返し表示 */
+            }
+
+            .message-input-container button {
+                padding: 10px 20px;
+                background-color: #66ccff;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            .message-input-container input[type="checkbox"] {
+                margin-bottom: 10px;
+                margin-right: 5px;
+                transform: translateY(2px);
+            }
+
+        .error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 0, 0, 0.8);
+            color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 3000;
+        }
+
+            .error-message button {
+                margin-top: 10px;
+                background-color: #fff;
+                color: #333;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #66ccff;
+            color: #fff;
+            position: relative; /* メッセージ入力枠の直下に配置 */
+            width: 100%;
+            z-index: 500; /* メッセージ入力枠より背面に配置 */
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Handy！何でも依頼しよう！</h1>
+    </header>
+    <div class="container">
+        <section class="main">
+            <h2>日常生活の困ったことから仕事の手伝いまで何でも依頼しよう！</h2>
+            <p></p>
+        </section>
+        <aside class="sidebar">
+            <h3>近くにいる人に頼める！</h3>
+            <p>忘れ物を届けて欲しい！ 勉強教えて！などなど！</p>
+        </aside>
+    </div>
+
+    <!-- メッセージ表示部分 -->
+    <div class="message-board">
+        <div class="message-board-lower" id="message-list">
+            <!-- メッセージがここに追加される -->
+        </div>
+    </div>
+
+    <!-- メッセージ入力欄 -->
+    <div class="message-input-container">
+        <div class="left-column">
+            <input type="text" id="message-text" placeholder="メッセージを入力">
+            <input type="number" id="message-amount" placeholder="金額">
+            <select id="message-gender">
+                <option value="">性別を選択</option>
+                <option value="male">男性</option>
+                <option value="female">女性</option>
+                <option value="none">希望しない</option>
+            </select>
+        </div>
+        <div class="right-column">
+            <input type="text" id="message-time" placeholder="時間">
+            <input type="text" id="message-location" placeholder="場所">
+            <label><input type="checkbox" id="emergency-checkbox"> 緊急</label>
+            <button onclick="sendMessage()">送信</button>
+        </div>
+    </div>
+
+    <!-- フッター -->
+    <footer>
+        <p>&copy; Handy！何でも依頼しよう！. All Rights Reserved.</p>
+    </footer>
+
+    <!-- エラーメッセージ -->
+    <div class="error-message" id="error-message">
+        すべての項目を入力してください。
+        <button onclick="hideErrorMessage()">はい</button>
+    </div>
+
+    <script>
+        function sendMessage() {
+            var messageText = document.getElementById('message-text').value.trim();
+            var messageAmount = document.getElementById('message-amount').value.trim();
+            var messageGender = document.getElementById('message-gender').value;
+            var messageTime = document.getElementById('message-time').value.trim();
+            var messageLocation = document.getElementById('message-location').value.trim();
+            var isEmergency = document.getElementById('emergency-checkbox').checked;
+
+            if (messageText !== '' && messageAmount !== '' && messageGender !== '' && messageTime !== '' && messageLocation !== '') {
+                var messageList = document.getElementById('message-list');
+                var messageItem = document.createElement('div');
+                messageItem.classList.add('message-item');
+                messageItem.innerHTML = '<img src="person-icon.png" alt="アイコン" onclick="alert(\'アイコンがクリックされました\')"><div class="message-item-content"><strong>メッセージ:</strong> ' + messageText + '</div><div class="message-item-amount"><strong>金額:</strong> ' + formatNumberWithCommas(messageAmount) + '円</div><div class="message-item-time"><strong>時間:</strong> ' + messageTime + '</div><div class="message-item-location"><strong>場所:</strong> ' + messageLocation + '</div><div class="message-item-gender"><strong>性別:</strong> ' + (messageGender === 'male' ? '男性' : (messageGender === 'female' ? '女性' : '希望しない')) + '</div>';
+
+                if (isEmergency) {
+                    messageItem.classList.add('emergency-message');
+                }
+
+                messageList.insertBefore(messageItem, messageList.firstChild); // メッセージをリストの最上部に追加
+                clearInputs();
+                addAcceptButton(messageItem);
+            } else {
+                displayErrorMessage();
+            }
+        }
+
+        function clearInputs() {
+            document.getElementById('message-text').value = '';
+            document.getElementById('message-amount').value = '';
+            document.getElementById('message-time').value = '';
+            document.getElementById('message-location').value = '';
+            document.getElementById('message-gender').value = '';
+            document.getElementById('emergency-checkbox').checked = false;
+        }
+
+        function addAcceptButton(messageItem) {
+            var acceptButton = document.createElement('button');
+            acceptButton.textContent = '受諾';
+            acceptButton.classList.add('accept-button');
+            acceptButton.addEventListener('click', function () {
+                messageItem.remove(); // メッセージを削除する
+            });
+            messageItem.appendChild(acceptButton);
+        }
+
+        function displayErrorMessage() {
+            var errorMessage = document.getElementById('error-message');
+            errorMessage.style.display = 'block';
+        }
+
+        function hideErrorMessage() {
+            var errorMessage = document.getElementById('error-message');
+            errorMessage.style.display = 'none';
+        }
+
+        function formatNumberWithCommas(number) {
+            return Number(number).toLocaleString('ja-JP');
+        }
+
+        window.onload = function () {
+            generateDummyMessages(10);
+        };
+
+        function generateDummyMessages(count) {
+            var messageList = document.getElementById('message-list');
+            for (var i = 1; i <= count; i++) {
+                var messageItem = document.createElement('div');
+                messageItem.classList.add('message-item');
+                messageItem.innerHTML = '<img src="person-icon.png" alt="アイコン" onclick="alert(\'アイコンがクリックされました\')"><div class="message-item-content"><strong>メッセージ:</strong> ダミーメッセージ ' + i + '</div><div class="message-item-amount"><strong>金額:</strong> ' + formatNumberWithCommas(i * 100) + '円</div><div class="message-item-gender"><strong>性別:</strong> 希望しない</div><div class="message-item-time"><strong>時間:</strong> 未設定</div><div class="message-item-location"><strong>場所:</strong> 未設定</div>';
+                messageList.appendChild(messageItem);
+                addAcceptButton(messageItem);
+            }
+        }
+    </script>
+
+</body>
+
+</html>
